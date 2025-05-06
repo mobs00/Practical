@@ -1,0 +1,33 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+# Load and prepare data
+iris = load_iris()
+X = iris.data
+y = iris.target
+X_scaled = StandardScaler().fit_transform(X)
+
+# Apply Agglomerative Clustering
+clustering = AgglomerativeClustering(n_clusters=3, linkage='ward')
+clusters = clustering.fit_predict(X_scaled)
+
+# Save results
+pd.DataFrame({'Sample Index': range(len(clusters)), 'Predicted Cluster': clusters}).to_csv('predicted_clusters.csv', index=False)
+
+# Create visualizations
+# Dendrogram
+plt.figure(figsize=(10, 7))
+dendrogram(linkage(X_scaled, method='single'), labels=iris.target_names[y])
+plt.title('Dendrogram for Agglomerative Hierarchical Clustering')
+plt.savefig('dendrogram.png')
+
+# Scatter plot
+plt.figure(figsize=(8, 6))
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=clusters, cmap='rainbow')
+plt.title('Agglomerative Clustering Results')
+plt.savefig('agglomerative.png')

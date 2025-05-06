@@ -1,0 +1,56 @@
+class InvertedIndex:
+    def __init__(self):
+        self.index = {}  # term -> list of document ids
+        self.documents = {}  # doc_id -> document content
+
+    def add_document(self, doc_id, content):
+        """Add a document to the index"""
+        self.documents[doc_id] = content
+        
+        # Tokenize the document (simple split by spaces)
+        terms = content.lower().split()
+        
+        # Add each term to the inverted index
+        for term in terms:
+            if term not in self.index:
+                self.index[term] = []
+            if doc_id not in self.index[term]:
+                self.index[term].append(doc_id)
+
+    def search(self, query):
+        """Search for documents containing all terms in the query"""
+        query_terms = query.lower().split()
+        
+        if not query_terms:
+            return []
+        
+        # Start with documents matching the first term
+        if query_terms[0] in self.index:
+            result_docs = set(self.index[query_terms[0]])
+        else:
+            return []
+        
+        # Intersect with documents matching each additional term
+        for term in query_terms[1:]:
+            if term in self.index:
+                result_docs = result_docs.intersection(self.index[term])
+            else:
+                return []  # If any term doesn't match, return empty result
+        
+        return list(result_docs)
+
+
+# Example usage
+if __name__ == "__main__":
+    # Create the inverted index
+    index = InvertedIndex()
+    
+    # Add some documents
+    index.add_document(1, "The quick brown fox jumped over the lazy dog")
+    index.add_document(2, "The lazy dog slept all day")
+    index.add_document(3, "The quick rabbit runs fast")
+    
+    # Search for documents
+    print("Search for 'quick':", index.search("quick"))
+    print("Search for 'lazy dog':", index.search("lazy dog"))
+    print("Search for 'fox rabbit':", index.search("fox rabbit"))

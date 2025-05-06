@@ -1,0 +1,41 @@
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+# Download necessary NLTK data files
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')  # needed for better lemmatization
+def preprocess_text(text):
+    # Initialize the lemmatizer
+    lemmatizer = WordNetLemmatizer()
+
+    # Define English stop words
+    stop_words = set(stopwords.words('english'))
+
+    # Tokenize the text (remove preserve_line as it's not needed here)
+    words = word_tokenize(text.lower())  # Convert to lowercase for consistency
+
+    # Remove stop words, non-alphabetic tokens, and lemmatize
+    preprocessed_words = []
+    for word in words:
+        if word.isalpha() and word.lower() not in stop_words:
+            lemmatized_word = lemmatizer.lemmatize(word, pos='v')  # Try verb lemmatization
+            if lemmatized_word == word:  # If no change, try noun lemmatization
+                lemmatized_word = lemmatizer.lemmatize(word, pos='n')
+            preprocessed_words.append(lemmatized_word)
+
+    return ' '.join(preprocessed_words)
+# Example text
+text = """
+Natural language processing (NLP) is a field of artificial intelligence (AI)
+that focuses on the interaction between computers and humans through natural language.
+The ultimate goal of NLP is to enable computers to understand, interpret, and generate human language.
+"""
+# Preprocess the text
+preprocessed_text = preprocess_text(text)
+print("Original Text:")
+print(text)
+print("\nPreprocessed Text:")
+print(preprocessed_text)
